@@ -1,9 +1,9 @@
-name: Continuos Integration
+name: Continuos Integration TESTE
 
 on: pull_request
 
 jobs:
-  continuos-integration:
+  continuos-integration: #nome do job
     runs-on: ubuntu-latest
 
     steps:
@@ -17,3 +17,5 @@ jobs:
           npm install
           npm run build 
           npm run test
+
+          #testando novamente
