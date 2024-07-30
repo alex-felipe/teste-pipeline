@@ -3,7 +3,7 @@ name: Continuos Integration TESTE
 on: pull_request
 
 jobs:
-  continuos-integration:
+  continuos-integration: #nome do job
     runs-on: ubuntu-latest
 
     steps:
