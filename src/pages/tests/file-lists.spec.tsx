@@ -1,12 +1,11 @@
-
-import { render, screen } from "@testing-library/react"
-import { QueryClient, QueryClientProvider } from "react-query";
-import { BrowserRouter } from "react-router-dom";
-import { FileListPage } from "../file-list";
-import * as useFiles from "../../hooks/useFiles"
-import * as router from "react-router";
 import { faker } from '@faker-js/faker';
 import "@testing-library/jest-dom";
+import { render, screen } from "@testing-library/react";
+import { QueryClient, QueryClientProvider } from "react-query";
+import * as router from "react-router";
+import { BrowserRouter } from "react-router-dom";
+import * as useFiles from "../../hooks/useFiles";
+import { FileListPage } from "../file-list";
 
 const useFilesSpy = jest.spyOn(useFiles, "useFiles");
 const useLocationSpy = jest.spyOn(router, "useLocation");
@@ -16,10 +15,11 @@ const renderComponent = () => {
     render(
         <QueryClientProvider client={queryClient}>
             <BrowserRouter>
-                <FileListPage/>
+                <FileListPage />
             </BrowserRouter>
         </QueryClientProvider>
     )
+    return queryClient;
 }
 
 const mountFile = () => ({
@@ -30,56 +30,55 @@ const mountFile = () => ({
     favorite: false
 })
 
-describe("FileList", () => {
+describe('FileList', () => {
     beforeEach(() => {
         useLocationSpy.mockReturnValue({
             pathname: "/",
             state: undefined,
-            key: "",
-            search: "",
-            hash: ""
-        })
+            key: '',
+            search: '',
+            hash: ''
+        });
     })
 
-    it("should render all files", () => {
-        const title = faker.name.jobTitle()
+    it('should render all files', () => {
+        const title = faker.name.jobTitle();
         useFilesSpy.mockReturnValue({
-            files: [{
-                id: faker.datatype.uuid(),
+            files: [{id: faker.datatype.uuid(),
                 title,
                 slug: faker.datatype.uuid(),
                 lastUpdated: faker.date.weekday(),
-                favorite: false
-            }],
+                favorite: false}],
             favorites: [],
             isLoading: false,
-            isError: false
+            isError: false,
         });
         renderComponent();
 
         expect(screen.getByText(title)).toBeInTheDocument();
-    })
+    });
 
-    it("should render loading element when isLoading", () => {
+    it('should render loading element when isLoading', () => {
         useFilesSpy.mockReturnValue({
             files: [mountFile()],
             favorites: [],
             isLoading: true,
-            isError: false
+            isError: false,
         });
         renderComponent();
 
         expect(screen.getByTestId("loading")).toBeInTheDocument();
-    })
+    });
 
-    it("should show favorites files when is favorite pathname", () => {
+    it("should show favorites files when is favorite", () => {
         useLocationSpy.mockReturnValue({
             pathname: "/favorites",
             state: undefined,
-            key: "",
-            search: "",
-            hash: ""
-        })
+            key: '',
+            search: '',
+            hash: ''
+        });
+
         const titleGeneral = faker.name.jobTitle();
         const titleFav = faker.name.jobTitle();
         useFilesSpy.mockReturnValue({
@@ -90,22 +89,21 @@ describe("FileList", () => {
                 lastUpdated: faker.date.weekday(),
                 favorite: false
             }],
-            favorites: [
-                {
-                    id: faker.datatype.uuid(),
-                    title: titleFav,
-                    slug: faker.datatype.uuid(),
-                    lastUpdated: faker.date.weekday(),
-                    favorite: true
-                }
-            ],
+            favorites: [{
+                id: faker.datatype.uuid(),
+                title: titleFav,
+                slug: faker.datatype.uuid(),
+                lastUpdated: faker.date.weekday(),
+                favorite: false
+            }],
             isLoading: false,
-            isError: false
+            isError: false,
         });
         renderComponent();
 
         expect(screen.getByText(titleFav)).toBeInTheDocument();
         expect(screen.queryByText(titleGeneral)).toBeNull();
     })
+
 
 })

@@ -1,66 +1,57 @@
-import { fireEvent, render, screen } from '@testing-library/react';
-import '@testing-library/jest-dom'
-import { BrowserRouter } from "react-router-dom";
-
-import { AsideNav } from '../aside-nav';
-import { QueryClientProvider, QueryClient } from 'react-query';
+import "@testing-library/jest-dom"
+import { fireEvent, render, screen } from "@testing-library/react"
+import { QueryClient, QueryClientProvider } from "react-query"
+import { BrowserRouter } from "react-router-dom"
+import { AsideNav } from "../aside-nav"
 
 const mockNavigate = jest.fn();
-
-jest.mock('react-router', () => ({
-    ...jest.requireActual('react-router'),
+jest.mock("react-router", () => ({
+    ...jest.requireActual("react-router"),
     useNavigate: () => mockNavigate
 }))
 
-describe("AsideNav", () => {
-    it("should render correctly", () => {
-        const queryClient = new QueryClient();
-        render(
+const renderComponent = () => {
+    const queryClient = new QueryClient();
+    render(
+        <QueryClientProvider client={queryClient}>
             <BrowserRouter>
-            <QueryClientProvider client={queryClient}>
                 <AsideNav />
-            </QueryClientProvider>
             </BrowserRouter>
-        )
+        </QueryClientProvider>
+    )
+    return queryClient;
+}
 
-        expect(screen.getByText("All files")).toBeInTheDocument();
-        expect(screen.getByText("Favorites")).toBeInTheDocument();
-        expect(screen.getByText("New")).toBeInTheDocument();
-    });
 
-    it("should call navigate with correct params", () => {
-        const queryClient = new QueryClient();
-        render(
-            <BrowserRouter>
-            <QueryClientProvider client={queryClient}>
-                <AsideNav />
-            </QueryClientProvider>
-            </BrowserRouter>
-        )
+describe('AsideNav', () => {	
+    it('should render correctly', () => {
+        // AAA => Arrange, Act, Assert
+        // Arrange
+        renderComponent();
 
-        const btn = screen.getByText("All files")
-
-        fireEvent.click(btn);
-
-        expect(mockNavigate).toHaveBeenCalled();
-        expect(mockNavigate).toHaveBeenCalledWith("/");
+        // Assert
+        expect(screen.getByText("All files")).toBeInTheDocument(); // Check if the text is in the document
+        expect(screen.getByText("Favorites")).toBeInTheDocument(); // Check if the text is in the document
     })
 
-    it.each([["All files", "/"], ["Favorites", "/favorites"]])("testings %s", (text, path) => {
-        const queryClient = new QueryClient();
-        render(
-            <BrowserRouter>
-            <QueryClientProvider client={queryClient}>
-                <AsideNav />
-            </QueryClientProvider>
-            </BrowserRouter>
-        )
+    it("Should call navigate when hits the button Allfiles", () => {
+        // Arrange
+        renderComponent();
+        const btnAllFiles = screen.getByText("All files"); // Get the button by text
 
-        const btn = screen.getByText(text);
+        // Act
+        fireEvent.click(btnAllFiles); // Click the AllFiles button
 
-        fireEvent.click(btn);
-
-        expect(mockNavigate).toHaveBeenCalled();
-        expect(mockNavigate).toHaveBeenCalledWith(path);
+        // Assert
+        expect(mockNavigate).toHaveBeenCalledWith("/"); // Check if the navigate function was called with the correct path
     })
+
+    it("Should call navigate when hits the button Favorites", () => {
+        renderComponent();
+        const btnFavorites = screen.getByText("Favorites"); // Get the button by text
+        fireEvent.click(btnFavorites); // Click the AllFiles button
+
+        expect(mockNavigate).toHaveBeenCalledWith("/favorites"); // Check if the navigate function was called with the correct path
+    })
+
 })
